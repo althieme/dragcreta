@@ -20,9 +20,9 @@ logging.basicConfig(
 Update(message=Message(channel_chat_created=False, chat=Chat(id=-1001887231210, title='Testes e melhorias', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 2, 26, 14, 27, 4, tzinfo=datetime.timezone.utc), delete_chat_photo=False, from_user=User(first_name='André L.', id=157762204, is_bot=False, language_code='pt-br', last_name='Thieme', username='alThieme'), group_chat_created=False, message_id=133, supergroup_chat_created=False, text='já percebi que tinha um typo e arrumei outros detalhes. acho que a gente pode liberar a versão beta semana que vem 😜'), update_id=91245966)
 """
 
-TOKEN =  # token obtido com o botfather 
+TOKEN =  'TOKEN'# token obtido com o botfather 
 itens = []
-grupo = #chat_id
+grupo = 'chat_id'
 
 meses = 'Jan,Feb,Mar,Abr,Mai,Jun,Jul,Set,Out,Nov,Dez'.split(',')
 
@@ -42,18 +42,25 @@ async def salvaItem(update: Update, context: ContextTypes.DEFAULT_TYPE):
         itens.append(item)
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Obrigada {update.effective_user.first_name}, já anotei seu artigo aqui!')
         print('Novo item!')
-    #Criar um contador de palavras dentro do DdG, tirano preposições, para gerar uma tatuagem automática.
+    
     else:
-        texto = update._effective_message.text
-        preposicoes = 'a,e,o,um,uma,de,que,por,se,em,de,ou,como,é,da,com,me,do,não,eu,no,na,porque,assim,então'.split(',')
-        for c in string.punctuation:
-            texto = texto.replace(c, '')
-        palavras = texto.split(' ')
-        for palavra in palavras:
-            if palavra not in context.chat_data and palavra not in preposicoes:
-                context.chat_data[palavra] = 1;
-            elif palavra in context.chat_data and palavra not in preposicoes:
-                context.chat_data[palavra] += 1
+        conta_palavras(update._effective_message.text, context.chat_data)
+
+#Criar um contador de palavras dentro do DdG, tirando palavras da lista de exclusão, para gerar uma tatuagem automática.
+def conta_palavras(s: str, contador_de_palavras: dict):
+    texto = s
+    lista_exclusao = 'a,e,o,um,uma,de,que,por,se,em,ou,como,é,da,com,me,do,não,eu,no,na,porque,assim,então'.split(',')
+    
+    for c in string.punctuation:
+        texto = texto.replace(c, '')
+    
+    palavras = list(filter(lambda p: p not in lista_exclusao and not p.isdigit(), texto.split(' ')))
+    
+    for palavra in palavras:
+        if palavra not in contador_de_palavras:
+            contador_de_palavras[palavra] = 1
+        else:
+           contador_de_palavras[palavra] += 1
 
 async def decreta(update: Update, context: ContextTypes.DEFAULT_TYPE):
     itens = context.bot_data
@@ -112,9 +119,11 @@ Decreto liberado, cumpra-se
         await context.bot.send_message(chat_id=update.effective_chat.id, text='Esse comando só pode ser usado no grupo do Dragões de Garagem!')
         print(update.effective_chat.id)
 
+def ttt():
+    print('TESTE')
 
 if __name__ == '__main__':
-    
+    ttt()
     
     application = ApplicationBuilder().token(TOKEN).build()
     
