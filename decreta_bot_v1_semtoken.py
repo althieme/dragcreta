@@ -10,7 +10,7 @@ from telegram import Update
 import time
 import logging
 import string
-from datetime import datetime
+from datetime import datetime, timedelta
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
 
 logging.basicConfig(
@@ -24,8 +24,6 @@ Update(message=Message(channel_chat_created=False, chat=Chat(id=-1001887231210, 
 TOKEN =  'TOKEN'# token obtido com o botfather 
 itens = []
 grupo = 'chat_id'
-
-meses = 'Jan,Feb,Mar,Abr,Mai,Jun,Jul,Set,Out,Nov,Dez'.split(',')
 
 async def enviar_mensagem(chat_id: str, context: ContextTypes.DEFAULT_TYPE, texto: str):
     await context.bot.send_message(chat_id=chat_id, text= texto)
@@ -78,48 +76,14 @@ async def decreta(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(time.asctime())
         return
 
-    itens = context.bot_data
+    artigos = context.bot_data
     palavras = context.chat_data
-    duplas = sorted(palavras.items(), key=lambda dupla: dupla[1], reverse = True)
-    figura = duplas[0][0]
+    figura = extrai_figura(palavras)
+    numero_decreto = str(update.effective_message.id)[-3:]
 
-    mes = nome_mes(hoje)
-    ano = hoje.year
-    numeroDec = str(update.effective_message.id)[-3:]
-    numeroArt = 2
-    
-    decreto = f""" DECRETO Nº {numeroDec}/{ano},  {mes} de {ano}
-
-A ministra robótica dracônica da República Draconiana, desenvolvida para organizar os assuntos de lazer, no uso da atribuição que lhe confere o artigo 6 das leis draconianas decreta: 
-
-Art. 1º Suspende-se o poder de veto dos agremiados desta nobre instituição enquanto perdurar este decreto\n"""
-    for art in itens:
-        decreto += f'Art. {numeroArt}º {art};\n'
-        numeroArt += 1
-        dataFim = int(time.asctime()[8:10]) + 2
-    if dataFim > 28 and mes == 'Feb':
-        dataFim = dataFim - 28
-        mes = 'Mar'
-        decreto += f'Art{numeroArt}º Determina-se o desenho de {figura} como o símbolo para todas as tatuagens a serem realizadas nesse períoto;\n'
-    elif dataFim > 30 and mes in ['Abr', 'Jun','Set','Nov']:
-        dataFim = dataFim - 30
-        numMes = meses.idex(mes) + 1
-        mes = meses[numMes]
-        decreto += f'Art{numeroArt}º Determina-se o desenho de {figura} como o símbolo para todas as tatuagens a serem realizadas nesse períoto;\n'
-    elif dataFim > 31 and mes in ['Jan', 'Mar', 'Mai', 'Jul', 'Ago', 'Out']:
-        dataFim = dataFim - 31
-        numMes = meses.index(mes) + 1
-        mes = meses[numMes]
-    elif dataFim > 31 and mes == 'Dez':
-        decreto += f'Art{numeroArt}º Estão liberadas as aberturas de garrafa de espumantes com pompa e circunstância!\n'
-        dataFim = 1
-        mes = 'Jan'
-    else:
-        decreto += f'Art. {numeroArt}º Determina-se a palavra (ou o desenho de) {figura} como inspiração para todas as tatuagens a serem realizadas neste período;\n'
-    decreto += f"""\nEste decreto entra em vigor na data de sua publicação e encerra-se às 23:59 de {dataFim} de {mes} de {ano}.
-
-Decreto liberado, cumpra-se
-#DecretoRobotico"""
+    decreto = gera_decreto(artigos, numero_decreto, figura, hoje)
+    # print(decreto)
+ 
     await enviar_mensagem(chat_group_id, context, decreto)
     print(context.bot_data)
     print(context.chat_data)
@@ -148,6 +112,48 @@ def nome_mes(data: datetime):
     }
     
     return nomes_dos_meses[data.month]
+
+def redige_artigo(numero_artigo: int, texto: str):
+    return f'Art. {numero_artigo}º {texto};'
+
+def redige_decreto(lista_artigos: list, numero_decreto: int, data_decreto: datetime, data_fim: datetime):
+
+    cabecalho = f""" DECRETO Nº {numero_decreto}/{data_decreto.year}, {data_decreto.day} de {nome_mes(data_decreto)} de {data_decreto.year}
+
+A ministra robótica dracônica da República Draconiana, desenvolvida para organizar os assuntos de lazer, no uso da atribuição que lhe confere o artigo 6 das leis draconianas decreta: 
+
+Art. 1º Suspende-se o poder de veto dos agremiados desta nobre instituição enquanto perdurar este decreto\n"""
+
+    rodape = f"""\nEste decreto entra em vigor na data de sua publicação e encerra-se às 23:59 de {data_fim.day} de {nome_mes(data_fim)} de {data_fim.year}.
+
+Decreto liberado, cumpra-se
+#DecretoRobotico"""
+
+    decreto = [cabecalho] + lista_artigos + [rodape]
+
+    return '\n'.join(decreto)
+
+def calcula_data_fim(data_decreto: datetime):
+    return data_decreto + timedelta(days=2) 
+
+def gera_decreto(artigos: list, numero_decreto: int, figura: str, data_decreto: datetime):
+    numero_artigo = 2
+    lista_artigos = []
+    for artigo in artigos:
+        lista_artigos.append(redige_artigo(numero_artigo, artigo))
+        numero_artigo += 1
+    lista_artigos.append(redige_artigo(numero_artigo, f'Determina-se a palavra (ou o desenho de) {figura} como inspiração para todas as tatuagens a serem realizadas neste período'))
+    numero_artigo += 1
+    
+    data_fim = calcula_data_fim(data_decreto)
+    if data_decreto.month > data_fim.month:
+        lista_artigos.append(redige_artigo(numero_artigo, f'Estão liberadas as aberturas de garrafa de espumantes com pompa e circunstância!'))
+
+    return redige_decreto(lista_artigos, numero_decreto, data_decreto, data_fim)
+
+def extrai_figura(palavras: dict):
+    duplas = sorted(palavras.items(), key=lambda dupla: dupla[1], reverse = True)
+    return duplas[0][0] 
 
 if __name__ == '__main__':
     
