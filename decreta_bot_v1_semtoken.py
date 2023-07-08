@@ -51,12 +51,13 @@ async def salvaItem(update: Update, context: ContextTypes.DEFAULT_TYPE):
 #Criar um contador de palavras dentro do DdG, tirando palavras da lista de exclusão, para gerar uma tatuagem automática.
 def conta_palavras(s: str, contador_de_palavras: dict):
     texto = s
-    lista_exclusao = 'a,e,o,um,uma,de,que,por,se,em,ou,como,é,da,com,me,do,não,eu,no,na,porque,assim,então'.split(',')
+    #lista_exclusao = 'a,e,o,um,uma,de,que,por,se,em,ou,como,é,da,com,me,do,não,eu,no,na,porque,assim,então,aqui'.split(',')
+    lista_exclusao = 'acho,antes,aqui,assim,com,como,então,isso,não,por,porque,que,sim,tem,uma'.split(',') # apenas palavras com ao menos 3 caracteres
     
     for c in string.punctuation:
         texto = texto.replace(c, '')
     
-    palavras = list(filter(lambda p: p not in lista_exclusao and not p.isdigit(), texto.split(' ')))
+    palavras = list(filter(lambda p: p not in lista_exclusao and not p.isdigit() and len(p) >= 3, texto.split(' ')))
     
     for palavra in palavras:
         if palavra not in contador_de_palavras:
@@ -142,7 +143,7 @@ def gera_decreto(artigos: list, numero_decreto: int, figura: str, data_decreto: 
     for artigo in artigos:
         lista_artigos.append(redige_artigo(numero_artigo, artigo))
         numero_artigo += 1
-    lista_artigos.append(redige_artigo(numero_artigo, f'Determina-se a palavra (ou o desenho de) {figura} como inspiração para todas as tatuagens a serem realizadas neste período'))
+    lista_artigos.append(redige_artigo(numero_artigo, f'Determina-se a palavra (ou o desenho de) "{figura}" como inspiração para todas as tatuagens a serem realizadas neste período'))
     numero_artigo += 1
     
     data_fim = calcula_data_fim(data_decreto)
