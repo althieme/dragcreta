@@ -126,7 +126,7 @@ async def decreta(update: Update, context: ContextTypes.DEFAULT_TYPE):
     	docItens = open(f'./itensde_{diaordinal}', 'r')
     	itens = docItens.readlines()
     except:
-    	itens = ['Relembra os agremiados que este decreto só é possível com a contribuição deles, envie seu item de decreto para mim, me pergunte como em privado ']
+    	itens = ['Relembra aos agremiados que este decreto só é possível com a contribuição de cada um de vocês, sus lindes, envie seu item de decreto para mim, me pergunte como em privado ']
     
     docFig = f'./figde_{diaordinal}'
     dia = hoje.day
