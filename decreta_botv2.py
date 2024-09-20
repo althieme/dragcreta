@@ -143,7 +143,7 @@ async def decreta(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     decreto = f""" DECRETO Nº {numeroDec}/{ano},  {mes} de {ano}
 
-A ministra robótica dracônica da República Draconiana, desenvolvida para organizar os assuntos de lazer, no uso da atribuição que lhe confere o artigo 6 das leis draconianas decreta: 
+A ministra robótica dracônica da República Draconiana, desenvolvida para organizar os assuntos de lazer, no uso da atribuição que lhe confere o artigo 16 das leis draconianas decreta: 
 
 Art. 1º Suspende-se o poder de veto dos agremiados desta nobre instituição enquanto perdurar este decreto\n"""
     if len(lista) > 0:
