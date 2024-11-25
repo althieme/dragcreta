@@ -5,10 +5,10 @@ from datetime import datetime
 import decreta_bot_v1_semtoken as bot
 
 def testa_conta_palavras():
-    artigo = "texto do artigo do decreto que está sendo gravado. Esse decreto tem a palavra decreto 3 vezes e a palavra artigo 2 vezes. Fora outras tantas. 100"
+    artigo = "texto do artigo do decreto que está sendo gravado. Esse decreto tem a palavra decreto 3 vezes e a palavra artigo 2 vezes. Fora outras tantas. 100 eu"
     contador = dict()
     bot.conta_palavras(artigo, contador)
-    expected = {'texto': 1, 'artigo': 2, 'decreto': 3, 'está': 1, 'sendo': 1, 'gravado': 1, 'Esse': 1, 'tem': 1, 'palavra': 2, 'vezes': 2, 'Fora': 1, 'outras': 1, 'tantas': 1}
+    expected = {'texto': 1, 'artigo': 2, 'decreto': 3, 'está': 1, 'sendo': 1, 'gravado': 1, 'Esse': 1, 'palavra': 2, 'vezes': 2, 'Fora': 1, 'outras': 1, 'tantas': 1}
     print('testa_conta_palavras\t\t', contador == expected)
          
 def testa_dia_decreto():
@@ -38,7 +38,7 @@ def testa_gera_decreto():
 
     decreto = bot.gera_decreto(['artigo A', 'artigo B'], 4,'borboleta', data)
 
-    deve_conter = ['DECRETO Nº 4/2023', '3 de março de 2023', 'Art. 2º artigo A;\nArt. 3º artigo B;\nArt. 4º Determina-se a', 'às 23:59 de 5 de março de 2023.', '(ou o desenho de) borboleta como inspiração']
+    deve_conter = ['DECRETO Nº 4/2023', '3 de março de 2023', 'Art. 2º artigo A;\nArt. 3º artigo B;\nArt. 4º Determina-se a', 'às 23:59 de 5 de março de 2023.', '(ou o desenho de) "borboleta" como inspiração']
     print('testa_gera_decreto\t\t', False not in list(map(lambda f:  f in decreto, deve_conter)))
 
 def testa_gera_decreto_fim_de_ano():
@@ -46,7 +46,7 @@ def testa_gera_decreto_fim_de_ano():
 
     decreto = bot.gera_decreto(['artigo A', 'artigo B'], 4,'borboleta', data)
 
-    deve_conter = ['DECRETO Nº 4/2023', '31 de dezembro de 2023', 'Art. 2º artigo A;\nArt. 3º artigo B;\nArt. 4º Determina-se a', 'às 23:59 de 2 de janeiro de 2024.', '(ou o desenho de) borboleta como inspiração', 'Art. 5º Estão liberadas']
+    deve_conter = ['DECRETO Nº 4/2023', '31 de dezembro de 2023', 'Art. 2º artigo A;\nArt. 3º artigo B;\nArt. 4º Determina-se a', 'às 23:59 de 2 de janeiro de 2024.', '(ou o desenho de) "borboleta" como inspiração', 'Art. 5º Estão liberadas']
     print('testa_gera_decreto_fim_de_ano\t', False not in list(map(lambda f:  f in decreto, deve_conter)))
 
 
